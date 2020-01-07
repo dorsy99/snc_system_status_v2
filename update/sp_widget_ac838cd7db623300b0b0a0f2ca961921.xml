@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, $sce) {
+
+	var c = this;
+	$scope.data.serviceDetails = $sce.trustAsHtml($scope.data.serviceDetails);
+	
+	c.getHTML = function(field) {
+		return $sce.trustAsHtml(field);
+	}
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.timeline {
+  list-style: none;
+  padding: 20px 10px 20px 10px;
+  position: relative;
+}
+
+.timeline:before {
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  content: " ";
+  width: 3px;
+  background-color: #eeeeee;
+  left: 50%;
+  margin-left: -1.5px;
+}
+
+.timeline &gt; li {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.timeline &gt; li:before,
+.timeline &gt; li:after {
+  content: " ";
+  display: table;
+}
+
+.timeline &gt; li:after {
+  clear: both;
+}
+
+.timeline &gt; li:before,
+.timeline &gt; li:after {
+  content: " ";
+  display: table;
+}
+
+.timeline &gt; li:after {
+  clear: both;
+}
+
+.timeline &gt; li &gt; .timeline-panel {
+  width: 46%;
+  float: left;
+  border: 1px solid #d4d4d4;
+  border-radius: 2px;
+  padding: 20px;
+  position: relative;
+  -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.175);
+  background-color: white;
+}
+
+.timeline &gt; li &gt; .timeline-panel:before {
+  position: absolute;
+  top: 26px;
+  right: -15px;
+  display: inline-block;
+  border-top: 15px solid transparent;
+  border-left: 15px solid #ccc;
+  border-right: 0 solid #ccc;
+  border-bottom: 15px solid transparent;
+  content: " ";
+}
+
+.timeline &gt; li &gt; .timeline-panel:after {
+  position: absolute;
+  top: 27px;
+  right: -14px;
+  display: inline-block;
+  border-top: 14px solid transparent;
+  border-left: 14px solid #fff;
+  border-right: 0 solid #fff;
+  border-bottom: 14px solid transparent;
+  content: " ";
+}
+
+.timeline &gt; li &gt; .timeline-badge {
+  color: #fff;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 1.4em;
+  text-align: center;
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  margin-left: -25px;
+  background-color: #999999;
+  z-index: 100;
+  border-top-right-radius: 50%;
+  border-top-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+
+.timeline &gt; li.timeline-inverted &gt; .timeline-panel {
+  float: right;
+}
+
+.timeline &gt; li.timeline-inverted &gt; .timeline-panel:before {
+  border-left-width: 0;
+  border-right-width: 15px;
+  left: -15px;
+  right: auto;
+}
+
+.timeline &gt; li.timeline-inverted &gt; .timeline-panel:after {
+  border-left-width: 0;
+  border-right-width: 14px;
+  left: -14px;
+  right: auto;
+}
+
+.timeline-badge.primary {
+  background-color: #2e6da4 !important;
+}
+
+.timeline-badge.success {
+  background-color: #3f903f !important;
+}
+
+.timeline-badge.warning {
+  background-color: #f0ad4e !important;
+}
+
+.timeline-badge.danger {
+  background-color: #d9534f !important;
+}
+
+.timeline-badge.info {
+  background-color: #5bc0de !important;
+}
+
+.timeline-title {
+  margin-top: 0;
+  color: inherit;
+}
+
+.timeline-shortdesc {
+ text-size: +1; 
+}
+
+.timeline-body &gt; p,
+.timeline-body &gt; ul {
+  margin-bottom: 0;
+}
+
+.timeline-body &gt; p + p {
+  margin-top: 5px;
+}
+
+li .active {
+  background-color: #eeeeee;
+}
+
+.day {
+  float: left;
+  margin: 0px 1px 0px 1px; 
+  width: 7.3px; 
+  max-width: 7.3px; 
+  min-width: 7.3px; 
+  height: 30px; 
+  border-radius: 3px; 
+}
+
+.multiple-issues {
+  position: relative;
+  top: -5px;
+}
+
+.nav &gt; li {
+  width: 50%;
+  text-align: center;
+}
+
+.nav-tabs &gt; li &gt; a {
+  	color: #555555;
+    margin-right: 2px;
+    line-height: 1.42857;
+    border: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+}
+ 
+.nav-tabs &gt; li.active &gt; a {
+    color: #555555;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+    cursor: default;
+}
+
+.tab-pane {
+  padding-top: 10px;
+}
+
+.label {
+  border-radius: 1em;
+  font-weight: normal;
+  font-size: 90%;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>service_timeline_v2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Service Timeline v2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	
+	data.service = input.service;
+	data.outages = [];
+	
+	var service = new GlideRecord("cmdb_ci_service");
+	service.get(data.service);
+	
+	data.serviceName = service.getDisplayValue();
+	data.serviceDetails = service.getValue("x_44522_sysstatsv2_service_details");
+	data.curOutages = getOuts(data.service);
+	
+	var count = 0;
+	
+	var curOutage = new GlideRecord("cmdb_ci_outage");
+	curOutage.addQuery("cmdb_ci", data.service);
+	curOutage.addNullQuery("end");
+	curOutage.orderByDesc("begin");
+	curOutage.query();
+	
+		while (curOutage.next()) {
+		count++;
+		var out = {};
+		out.typeDisplay = curOutage.type.getDisplayValue();
+		out.type = curOutage.getValue("type");
+		out.details = curOutage.getValue("details");
+		out.ci = curOutage.cmdb_ci.getDisplayValue();
+		out.sys_id = curOutage.getUniqueValue();
+		out.taskid = curOutage.getValue("task_number");
+		out.task_type = curOutage.getDisplayValue("task_number");
+		out.serviceID = curOutage.getValue("cmdb_ci");
+		out.resolution = curOutage.getValue("x_44522_sysstatsv2_u_resolution_notes")
+		out.begin = curOutage.begin.getDisplayValue();
+		out.end = curOutage.end.getDisplayValue();
+		
+		out.short_description = curOutage.getValue("short_description");
+		
+		var gr = new GlideRecord("incident");
+		gr.get(curOutage.task_number);
+		out.task_severity = gr.getDisplayValue("priority");
+		
+		if (count % 2 == 0) {
+			out.liClass = "timeline-inverted";
+		} else {
+			out.liClass = "";
+		}
+		data.outages.push(out);
+	}
+	
+	
+	
+	var outage = new GlideRecord("cmdb_ci_outage");
+	outage.addQuery("cmdb_ci", data.service);
+	outage.addNotNullQuery("end");
+	outage.orderByDesc("begin");
+	
+	outage.query();
+	
+	
+	
+	while (outage.next()) {
+		count++;
+		var out2 = {};
+		out2.typeDisplay = outage.type.getDisplayValue();
+		out2.type = outage.getValue("type");
+		out2.details = outage.getValue("details");
+		out2.ci = outage.cmdb_ci.getDisplayValue();
+		out2.sys_id = outage.getUniqueValue();
+		out2.taskid = outage.getValue("task_number");
+		out2.task_type = outage.getDisplayValue("task_number");
+		out2.serviceID = outage.getValue("cmdb_ci");
+		out2.resolution = outage.getValue("x_44522_sysstatsv2_u_resolution_notes")
+		out2.begin = outage.begin.getDisplayValue();
+		out2.end = outage.end.getDisplayValue();
+		
+		out2.short_description = outage.getValue("short_description");
+		
+		var gr2 = new GlideRecord("incident");
+		gr2.get(outage.task_number);
+		out2.task_severity = gr2.getDisplayValue("priority");
+		
+		if (count % 2 == 0) {
+			out2.liClass = "timeline-inverted";
+		} else {
+			out2.liClass = "";
+		}
+		data.outages.push(out2);
+	}
+	
+
+	
+	//COLOUR BARS:
+	
+	var serviceGr = new GlideRecord("cmdb_ci_service");
+	if (serviceGr.get(data.service))
+		data.serviceDisplay = serviceGr.getDisplayValue();
+	else
+		(data.service = null);
+	data.days = [];
+	for (var i = 89; i >= 0; i--) {
+		var day = {};
+		day.date = new GlideDateTime(gs.daysAgo(i)).getLocalDate().getDisplayValue();
+		var out2 = new GlideAggregate("cmdb_ci_outage");
+		out2.addQuery("cmdb_ci", service.getUniqueValue());
+		out2.addQuery("end", ">=", gs.daysAgoStart(i)).addOrCondition("end", "=", "NULL");
+		out2.addQuery("begin", "<=", gs.daysAgoEnd(i));
+		out2.addAggregate('COUNT', 'type');
+		out2.query();
+		day.count = 0;
+
+		while (out2.next()) {
+			var type = out2.type;
+			var typeCount = out2.getAggregate('COUNT', 'type');
+			day[type] = typeCount;
+			day.count += typeCount;
+		}
+		day.msg = gs.getMessage("No issues");
+		day.color = "#5cb85c";
+		if (day.count > 1) {
+			day.msg = gs.getMessage("Multiple issues");
+			day.color = "#6E4CDD";
+		} else if (day.outage > 0) {
+			day.msg = gs.getMessage("Outage");
+			day.color = "#BB0000";
+		} else if (day.degradation > 0) {
+			day.msg = gs.getMessage("Service degradation");
+			day.color = "#f0ad4e";
+		} else if (day.planned > 0) {
+			day.msg = gs.getMessage("Planned maintenance");
+			day.color = "#5bc0de";
+		}
+		data.days.push(day);
+	}
+	
+	function getOuts(serviceID) {
+		var rtn = [];
+		var num = 0;
+		var type = "";
+		var gr = new GlideRecord("cmdb_ci_outage");
+		gr.addQuery("cmdb_ci",serviceID);
+		gr.addQuery("end", "NULL");
+		gr.query();
+		while (gr.next()) {
+			num++;
+			if (num > 1) {
+				type = "Multiple";
+			} else {
+				type = gr.getDisplayValue("type");
+			}
+		}
+		rtn.push(num);
+		rtn.push(type);
+		return rtn;
+	}
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-07-14 23:59:52</sys_created_on>
+        <sys_id>ac838cd7db623300b0b0a0f2ca961921</sys_id>
+        <sys_mod_count>8</sys_mod_count>
+        <sys_name>Service Timeline v2</sys_name>
+        <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+        <sys_update_name>sp_widget_ac838cd7db623300b0b0a0f2ca961921</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-07-15 01:04:01</sys_updated_on>
+        <template><![CDATA[
+<div class="panel-body">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="javascript:void(0)" data-target="#details" aria-controls="details" role="tab" data-toggle="tab">Details</a></li>
+    <li role="presentation"><a href="javascript:void(0)" data-target="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
+  </ul>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="details">
+      <table class="table table-sm">
+        <tbody>
+          <tr>
+          <tr ng-if="data.serviceDetails">
+            <td style="width: 15%;">${About}</td>
+            <td><div ng-bind-html="::data.serviceDetails"></div></td>
+          </tr>
+          <tr>
+            <td>${Current Status}</td>
+            <td>
+              <span ng-if="data.curOutages[0] == 0" class="label label-success">${Operational}</span>
+              <span ng-if="data.curOutages[0] == 1 && data.curOutages[1] == 'Outage'" class="label label-danger">{{data.curOutages[1]}}</span>
+              <span ng-if="data.curOutages[0] == 1 && data.curOutages[1] == 'Planned Outage'" class="label label-info">{{data.curOutages[1]}}</span>
+              <span ng-if="data.curOutages[0] == 1 && data.curOutages[1] == 'Degradation'" class="label label-warning">{{data.curOutages[1]}}</span>
+              <span ng-if="data.curOutages[0] > 1" class="label label-primary">${Multiple Issues}</span>
+            </td>
+          </tr>
+          <tr>
+            <td>${Past 90 Days}</td>
+            <td>${Color bar indicators flow left to right, from oldest to most recent status.}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 10px;">
+        <div ng-repeat="day in data.days" class="day" ng-class="{'multiple-issues': (day.count > 0)}" ng-style="::{'background-color': day.color}" tooltips tooltip-template="{{::day.msg}} {{::day.date}}"></div>
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="history">
+      <div ng-if="data.outages.length == 0">
+        ${This service has no outages recorded}
+      </div>
+      <ul class="timeline well" ng-if="data.outages.length != 0">
+        <li ng-repeat="outage in data.outages" class="{{outage.liClass}}">
+          <div ng-if="outage.type == 'planned'" class="timeline-badge info">
+            <i class="fa fa-info-circle"></i>
+          </div>
+          <div ng-if="outage.type == 'outage'" class="timeline-badge danger">
+            <i class="fa fa-exclamation-circle"></i>
+          </div>      
+          <div ng-if="outage.type == 'degradation'" class="timeline-badge warning">
+            <i class="fa fa-minus-circle"></i>
+          </div>      
+          <div class="timeline-panel">
+            <div class="timeline-heading">
+              <h3 class="timeline-title">{{outage.typeDisplay}}</h3>
+              <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i>${ started {{outage.begin}}}</small><small class="text-muted" ng-if="outage.end">${ and ended {{outage.end}}}</small></p>
+            </div>
+            <div>
+              <h4>{{outage.short_description}}</h4>
+            </div>
+            <div ng-if="outage.end && outage.type != 'planned'">
+              <div ng-if="outage.task_severity">
+                <strong>${Priority}</strong><br />{{outage.task_severity}}
+              </div>
+              <p> </p>
+              <div ng-if="outage.resolution">
+                <strong>${Resolution Notes}</strong>
+              </div>
+              <div ng-if="outage.resolution" class="timeline-body" ng-bind-html="outage.resolution"></div>
+              <!--<div ng-if="!outage.resolution" class="timeline-body">${No resolution notes provided}</div>-->
+            </div>
+            <p> </p>
+            <div ng-if="outage.details">
+              <strong>${Details}</strong>
+            </div>
+            <div ng-if="outage.details" class="timeline-body" ng-bind-html="c.getHTML(outage.details)">
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+
+</div>
+
+]]></template>
+    </sp_widget>
+</record_update>

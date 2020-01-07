@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function ($scope, $rootScope, spUtil, spModal) {
+	var c = this;
+	
+	c.subscribeAll = function() {
+		spModal.confirm("Are you sure you want to subscribe to all services?").then(function() {
+			c.data.action = "subscribeAll";
+			c.server.update().then(function(){
+				$rootScope.$emit("widgetRefresh");
+			});
+		});
+	}
+
+	c.unsubscribeAll = function() {
+		spModal.confirm("Are you sure you want to unsubscribe from all services?").then(function() {
+			c.data.action = "unsubscribeAll";
+			c.server.update().then(function(){
+				$rootScope.$emit("widgetRefresh");
+			});
+		});
+	}
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>notification_legend_v2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Notification Legend v2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[data.subsList = [];
+data.serviceList = [];
+data.toSubscribe = [];
+
+var currentSubs = new GlideRecord("m2m_sp_status_subscription");
+currentSubs.addQuery("sys_user", gs.getUserID());
+currentSubs.query();
+while (currentSubs.next()) {
+	data.subsList.push(currentSubs.cmdb_ci_service.toString());
+}
+
+var allServices = new GlideRecord("cmdb_ci_service");
+allServices.addEncodedQuery("operational_status=1^used_for=Production");
+allServices.query();
+while (allServices.next()) {
+	data.serviceList.push(allServices.getUniqueValue());
+}
+
+for (var i = 0; i < data.serviceList.length; i++) {
+	if (data.subsList.indexOf(data.serviceList[i]) == -1) {
+		data.toSubscribe.push(data.serviceList[i]);
+	}
+}
+
+if (typeof input != "undefined") {
+	if (input.action == "subscribeAll") {
+		for (var j = 0; j <= data.toSubscribe.length; j++) {
+			var newSub = new GlideRecord("m2m_sp_status_subscription");
+			newSub.addQuery("sys_user", gs.getUserID());
+			newSub.addQuery("cmdb_ci_service", data.toSubscribe[j]);
+			newSub.query();
+			if (!newSub.next()) {
+				newSub.sys_user = gs.getUserID();
+				newSub.cmdb_ci_service = data.toSubscribe[j];
+				newSub.insert();
+			}
+		}
+		
+	}	else if (input.action == "unsubscribeAll") {
+		var delGr = new GlideRecord("m2m_sp_status_subscription");
+		delGr.addQuery("sys_user", gs.getUserID());
+		delGr.query();
+		while (delGr.next()) {
+			delGr.deleteRecord();
+		}
+	}
+}
+
+data.loggedIn = gs.isLoggedIn();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-07-15 00:04:42</sys_created_on>
+        <sys_id>9394041bdb623300b0b0a0f2ca961981</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Notification Legend v2</sys_name>
+        <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+        <sys_update_name>sp_widget_9394041bdb623300b0b0a0f2ca961981</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-07-15 00:05:43</sys_updated_on>
+        <template><![CDATA[<div ng-if="data.loggedIn" class="panel panel-{{options.color}} b">
+  <div class="panel-heading">
+    <h4 class="panel-title">${Service Subsctiptions}</h4>
+  </div>
+
+  <div class="panel-body">
+    <div>
+      <div class="m-b">
+        ${When an outage is logged against a service, notifications are sent to people who have subscribed. Icons are shown to indicate your subscription to a service.}
+      </div>
+    </div>
+    <div>
+      <div class="m-b"><i class="fa fa-envelope" aria-hidden="true"></i> ${Subscribed to Updates}
+      <div class="m-b"><i class="fa fa-envelope-o" aria-hidden="true"></i> ${Not Subscribed to Updates}
+    </div>
+    <div>
+      <hr />
+      <div class="m-b text-center">${Click below to Subscribe to All Services}</div>
+      <button class="btn btn-primary btn-block" ng-click="c.subscribeAll()">${Subscribe To All Services}</button><br />
+      <button class="btn btn-primary btn-block" ng-click="c.unsubscribeAll()">${Unsubscribe From All Services}</button>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

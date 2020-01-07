@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function(spModal) {
+  var c = this;
+	
+	c.openOutage = function($event, type, $outage){
+		var icon = "";
+		var text = "";
+		
+		if (type == "outage") {
+			icon = "minus";
+		  text = "danger";
+		} else if (type == "degradation") {
+			icon = "exclamation";
+			text = "warning";
+		} else if (type == "planned") {
+			icon = "info";
+			text = "primary";
+		}
+		
+		var outageId = $event.currentTarget.dataset.outage;
+		spModal.open({
+			widget: 'outage_details_v2',
+			widgetInput: {
+				outage:outageId
+			},
+			title: '<h3 style="margin-top: 10px;"><i class="fa fa-' + icon + '-circle text-' + text + '"></i> ' + $outage + '</h3>',
+			buttons: []
+		})
+	}
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.bs-callout {
+  margin: 10px 0 !important;
+  padding: 10px 20px 10px 20px !important;
+  border-left-style: solid;
+  border-left-width: 10px;
+  color: $gray-dark;
+}
+
+.bs-callout-outage {
+  background-color: lighten($danger, 40%);
+  border-color: $danger;
+}
+
+.bs-callout-degradation {
+  background-color: lighten($warning, 35%);
+  border-color: $warning;
+}
+
+.bs-callout-planned {
+  background-color: lighten($info, 35%);
+  border-color: $info;
+}
+
+.bs-callout-success {
+  background-color: lighten($success, 40%);
+  border-color: $success;
+}
+
+.tooltip-inner {
+    width: 150px;
+}
+
+a {
+  color: #3a3f51;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>planned_maintenance_v2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Planned Maintenance v2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[var outage = new GlideRecord("cmdb_ci_outage");
+outage.addQuery("begin", "<=", gs.daysAgoStart(-5));
+outage.addQuery("end", ">=", new GlideDateTime().getValue());
+outage.addQuery("type", "planned");
+data.service = (input && input.service) || $sp.getParameter("service");
+if (data.service) {
+  outage.addQuery("cmdb_ci", data.service);
+	var serviceGR = new GlideRecord("cmdb_ci_service");
+	if (serviceGR.get(data.service))
+		data.serviceDisplay = serviceGR.getDisplayValue();
+}
+outage.query();
+data.outages = [];
+data.outageIDs = "";
+while (outage.next()) {
+	var out = {};
+	out.sys_id = outage.getUniqueValue();
+	out.typeDisplay = outage.type.getDisplayValue();
+	out.type = outage.getValue("type");
+	out.ci = outage.cmdb_ci.getDisplayValue();
+	out.begin = outage.begin.getDisplayValue();
+	out.end = outage.end.getDisplayValue();
+	out.serviceID = outage.getValue("cmdb_ci");
+	data.outages.push(out);
+	data.outageIDs += "," + outage.getUniqueValue();
+}]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-07-15 00:11:52</sys_created_on>
+        <sys_id>9846c81fdb623300b0b0a0f2ca961928</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Planned Maintenance v2</sys_name>
+        <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+        <sys_update_name>sp_widget_9846c81fdb623300b0b0a0f2ca961928</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-07-15 00:26:51</sys_updated_on>
+        <template><![CDATA[<div ng-if="!data.service || data.outages.length > 0" class="panel panel-{{options.color}} b">
+  <div class="panel-heading">
+    <h2 class="panel-title">${Planned Maintenance}<span ng-if="data.serviceDisplay"> - {{data.serviceDisplay}}</span></h2>
+  </div>
+
+  <div class="panel-body">
+    <div ng-if="!data.service">${We publish information on planned service availability below.} ${This includes events occuring over the next 5 days.}</div>
+
+    <div ng-if="data.outages.length == 0" class="col-xs-12 bs-callout bs-callout-success">
+      ${No service maintenance is planned over the next 5 days}
+    </div>
+    <div ng-if="data.outages.length > 0" ng-repeat="outage in data.outages" class="col-xs-12 bs-callout bs-callout-{{outage.type}}">
+      <a ng-if="!data.service" href="javascript:void(0)" data-outage="{{outage.sys_id}}" ng-click="c.openOutage($event, outage.type, outage.ci + ' - ' + outage.typeDisplay)" style="color:inherit">
+        <span style="font-size: 120%">{{outage.ci}}</span><br />${Maintenance Planned from {{outage.begin}} to {{outage.end}}}
+      </a>
+      <span ng-if="data.service" style="color:inherit">${Planned maintenance} - {{outage.ci}}, ${service will be unavailable {{outage.begin}} to {{outage.end}}}</span>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, $sce) {
+  var c = this;
+	$scope.data.details = $sce.trustAsHtml($scope.data.details);
+	
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>outage_details_v2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Outage Details v2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+	
+	var gr = new GlideRecord("cmdb_ci_outage");
+	gr.get(input.outage);
+	
+	data.service = gr.getDisplayValue("cmdb_ci");
+	data.type = gr.getValue("type");
+	data.begin = gr.getDisplayValue("begin");
+	data.end = gr.getDisplayValue("end");
+	data.task_number = gr.getDisplayValue("task_number");
+	data.short_description = gr.getValue("short_description");
+	data.details = gr.getValue("details");
+	data.resolution = gr.getValue("x_44522_sysstatsv2_u_resolution_notes");
+	
+	
+	var grTask = new GlideRecord("incident");
+	grTask.get(gr.task_number);
+	
+	data.task_priority = grTask.getDisplayValue("priority");
+	
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-07-15 00:03:07</sys_created_on>
+        <sys_id>5c44041bdb623300b0b0a0f2ca96197d</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Outage Details v2</sys_name>
+        <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+        <sys_update_name>sp_widget_5c44041bdb623300b0b0a0f2ca96197d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-07-15 00:54:21</sys_updated_on>
+        <template><![CDATA[<div>
+  <h4 style="margin-bottom: 5px">
+    {{data.short_description}}
+  </h4>
+  <p>
+    <small class="text-muted"><i class="glyphicon glyphicon-time"></i>${ started {{data.begin}}}</small><small class="text-muted" ng-if="data.end">${ and ended {{data.end}}}</small>
+  </p>
+  
+	<div ng-if="data.task_number">
+    <p>
+    	<strong>Priority</strong><br />{{data.task_priority}}
+    </p>
+  </div>
+  <div ng-if="data.end && data.type != 'planned'">
+    <div>
+      <strong>${Resolution Notes}</strong>
+    </div>
+    <p>
+    <span ng-if="data.resolution">{{data.resolution}}</span>
+    <span ng-if="!data.resolution">${No Resolution Notes provided for this outage}</span>
+    </p>
+  </div>
+  <div ng-if="data.details">
+    <strong>${Details}</strong>
+    <div ng-bind-html="::data.details"></div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

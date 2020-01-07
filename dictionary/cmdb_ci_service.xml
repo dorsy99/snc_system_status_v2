@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element audit="true" extends="cmdb_ci" label="Business Service" max_length="40" name="cmdb_ci_service" sizeclass="59" type="collection">
+        <element label="Service Details" max_length="8000" name="x_44522_sysstatsv2_service_details" type="html"/>
+    </element>
+</database>

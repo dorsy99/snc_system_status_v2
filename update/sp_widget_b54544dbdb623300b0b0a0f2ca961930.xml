@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function ($scope, spUtil, snRecordWatcher, $rootScope, spModal) {
+		//Incident Buttons:
+	var c = this;
+	
+	c.createIncident = function(outage, $event) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		c.data.action = 'create_incident';
+		c.data.outage = outage;
+		c.server.update().then(function() {
+			c.data.action = '';
+			c.data.outage = '';
+			spUtil.update($scope);
+		})
+	} 
+
+	c.showIncident = function(outage, $event) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		window.location = '?view=sp&id=ticket&table=incident&sys_id=' + outage.incident_sys_id;
+	}
+	
+	c.openOutage = function($event, type, $outage){
+		var icon = "";
+		var text = "";
+		
+		if (type == "outage") {
+			icon = "minus";
+		  text = "danger";
+		} else if (type == "degradation") {
+			icon = "exclamation";
+			text = "warning";
+		} else if (type == "planned") {
+			icon = "info";
+			text = "primary";
+		}
+		
+		var outageId = $event.currentTarget.dataset.outage;
+		spModal.open({
+			widget: 'outage_details_v2',
+			widgetInput: {
+				outage:outageId
+			},
+			title: '<h3 style="margin-top: 10px;"><i class="fa fa-' + icon + '-circle text-' + text + '"></i> ' + $outage + '</h3>',
+			buttons: []
+		})
+	}
+
+	$scope.standalone = $scope.options.standalone == 'true' || $scope.options.standalone == true;
+  var q = "cmdb_ci.sys_class_name=cmdb_ci_service";
+  if ($scope.data.outageIDs != "")
+    q += "^NQ" + $scope.data.outageIDs;
+
+  snRecordWatcher.initList("cmdb_ci_outage", q);
+
+  function get() {
+		$rootScope.$broadcast("sp.outage.updated");
+    spUtil.update($scope);
+  }
+
+  $scope.$on('record.updated', get);
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.bs-callout {
+  margin: 10px 0 !important;
+  padding: 10px 20px 10px 20px !important;
+  border-left-style: solid;
+  border-left-width: 10px;
+  color: $gray-dark;
+}
+
+.bs-callout-outage {
+  background-color: lighten($danger, 40%);
+  border-color: $danger;
+}
+
+.bs-callout-degradation {
+  background-color: lighten($warning, 35%);
+  border-color: $warning;
+}
+
+.bs-callout-planned {
+  background-color: lighten($info, 35%);
+  border-color: $info;
+}
+
+.bs-callout-success {
+  background-color: lighten($success, 40%);
+  border-color: $success;
+}
+
+.tooltip-inner {
+    width: 150px;
+}
+
+div.sp-outage-details {
+  margin-bottom: -10px;
+}
+
+button {
+  margin-top: 5px;
+}
+
+a {
+  color: #3a3f51;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>current_status_v2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Current Status v2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// populate the 'data' object
+// e.g., data.table = $sp.getValue('table');
+var outage = new GlideRecord("cmdb_ci_outage");
+outage.addQuery("cmdb_ci.sys_class_name", "cmdb_ci_service");
+outage.addQuery("begin", "<=", new GlideDateTime().getValue());
+outage.addQuery("end", ">=", new GlideDateTime().getValue()).addOrCondition("end", "=", "NULL");
+outage.orderByDesc("type");
+if (options.num_to_show) {
+	outage.setLimit(options.num_to_show);
+}
+data.service = (input && input.service) || $sp.getParameter("service");
+if (data.service) {
+  outage.addQuery("cmdb_ci", data.service);
+	var serviceGR = new GlideRecord("cmdb_ci_service");
+	if (serviceGR.get(data.service))
+		data.serviceDisplay = serviceGR.getDisplayValue();
+}
+outage.query();
+data.outages = [];
+data.outageIDs = "";
+while (outage.next()) {
+	var out = {};
+	out.typeDisplay = outage.type.getDisplayValue();
+	out.type = outage.getValue("type");
+	out.details = outage.getValue("details");
+	out.ci = outage.cmdb_ci.getDisplayValue();
+	out.sys_id = outage.getUniqueValue();
+	out.taskid = outage.getValue("task_number");
+	out.task_type = outage.getDisplayValue("task_number");
+	out.serviceID = outage.getValue("cmdb_ci");
+	
+	var tsknumGr = new GlideRecord("incident");
+	tsknumGr.get(out.taskid);
+	
+	out.category = tsknumGr.getValue("category");
+	out.subcategory = tsknumGr.getValue("subcategory");
+	
+	out.begin = outage.begin.getDisplayValue();
+	
+	var loggedIncGr = new GlideRecord('task_outage');
+	loggedIncGr.addEncodedQuery("task.numberSTARTSWITHINC^task.opened_by=" + gs.getUserID() + "^outage=" + outage.getUniqueValue());
+	loggedIncGr.query();
+	
+	var hasInc = loggedIncGr.next();
+	out.incident_number = hasInc ? loggedIncGr.task.getDisplayValue() : false;
+	out.incident_sys_id = hasInc ? loggedIncGr.getValue('task') : false;
+	
+	data.outages.push(out);
+	data.outageIDs += "," + outage.getUniqueValue();
+}
+
+if (input && input.action == 'create_incident') {
+	
+	var incidentGr = new GlideRecord('incident');
+	incidentGr.short_description = "I'm affected by outage: " + input.outage.typeDisplay + ": " + input.outage.ci;
+	incidentGr.caller_id = gs.getUserID();
+	incidentGr.u_on_behalf_of = gs.getUserID();
+	incidentGr.business_service = input.outage.serviceID;
+	if (input.outage.task_type.indexOf("INC") != -1) {
+		incidentGr.parent_incident = input.outage.taskid;
+		incidentGr.category = input.outage.category;
+		incidentGr.subcategory = input.outage.subcategory;
+	} else if (input.outage.task_type.indexOf("PRB") != -1) {
+		incidentGr.problem_id = input.outage.taskid;
+	} else if (input.outage.task_type.indexOf("CHG") != -1) {
+		incidentGr.caused_by = input.outage.taskid;
+	}
+	incidentGr.state = 2;
+	var incidentSysId = incidentGr.insert();
+	
+	data.incident_number = incidentGr.getValue('number');
+
+	var taskOutageGr = new GlideRecord('task_outage');
+	taskOutageGr.task = incidentSysId;
+	taskOutageGr.outage = input.outage.sys_id;
+	taskOutageGr.insert();
+	
+	data.response = gs.getMessage('Incident ' + incidentGr.getValue("number") + ' submitted.');
+	data.response_link = '?view=sp&id=ticket&table=incident&sys_id=' + incidentGr.getValue("sys_id")
+	
+	data.action = '';
+	data.outage = '';
+}]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-07-15 00:07:36</sys_created_on>
+        <sys_id>b54544dbdb623300b0b0a0f2ca961930</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>Current Status v2</sys_name>
+        <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+        <sys_update_name>sp_widget_b54544dbdb623300b0b0a0f2ca961930</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-07-15 00:25:30</sys_updated_on>
+        <template><![CDATA[<div ng-if="!data.service || data.outages.length > 0" class="panel panel-{{options.color}} b">
+  <div class="panel-heading">
+    <h2 class="panel-title">${Current Status}<span ng-if="data.serviceDisplay"> - {{data.serviceDisplay}}</span></h2>
+  </div>
+
+  <div class="panel-body">
+    <div ng-if="data.response" class="alert alert-success"><a href='{{::data.response_link}}'>{{::data.response}}</a></div>
+    <div ng-if="!standalone && !data.service && data.outages.length == 0" class="hidden-xs">${We constantly monitor our services and their related components.} ${If there is ever a service interruption, a notification will be posted to this page.} ${If you are experiencing problems not listed on this page, you can submit a request for service.}</div>
+
+    <div ng-if="data.outages.length == 0" class="col-xs-12 bs-callout bs-callout-success">
+      <div ng-if="!data.service">${No system is reporting an issue}</div>
+    </div>
+    <div ng-if="data.outages.length > 0" ng-repeat="outage in data.outages" class="col-xs-12 bs-callout bs-callout-{{outage.type}}">
+      <a ng-if="!data.service" href="javascript:void(0)" data-outage="{{outage.sys_id}}" ng-click="c.openOutage($event, outage.type, outage.ci + ' - ' + outage.typeDisplay)"><span style="font-size: 120%">{{outage.ci}}</span> - {{outage.typeDisplay}}<br />${started {{outage.begin}}}
+        <div ng-if="options.show_outage_details == 'true' && outage.details" ng-bind-html="outage.details" class="sp-outage-details"></div>
+      </a>
+      <span ng-if="data.service" style="color:inherit">{{outage.typeDisplay}} - {{outage.ci}} (${started {{outage.begin}}})
+        <div ng-if="options.show_outage_details == 'true' && outage.details" ng-bind-html="outage.details" class="sp-outage-details"></div>
+      </span>
+      <span style="display: block;">
+        <button ng-if="!outage.incident_sys_id" type="button" class="btn btn-primary btn-sm pull-left" ng-click="c.createIncident(outage, $event);">I'm affected too</button>
+        <button ng-if="outage.incident_sys_id" type="button" class="btn btn-primary btn-sm pull-left" ng-click="c.showIncident(outage, $event);">Logged for you as {{ outage.incident_number }}</button>
+      </span>
+    </div>
+    <div ng-if="::standalone"><a href="?id=services_status" aria-label="${More information, open current status page}">${More information...}</a></div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

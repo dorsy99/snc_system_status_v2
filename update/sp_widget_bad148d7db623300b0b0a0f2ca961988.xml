@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, $rootScope, spUtil, spModal) {
+	for (var x in $scope.data.dates) {
+		var dateStr = moment($scope.data.dates[x]).format('ll').split(',')[0];
+		//Now we need to parse the date number into a real number so the screen reader reads it correctly
+		var dateObj = {
+			month: $scope.data.monthTranslations[dateStr.split(" ")[0]],
+			day: parseInt(dateStr.split(" ")[1])
+		}
+		$scope.data.dates[x] = dateObj;
+	}
+	
+	//Subscription Additions
+	var c = this;
+
+	c.subscribe = function(serviceID) {
+		c.data.action = "subscribe";
+		c.data.serviceID = serviceID;
+		c.server.update();
+	}
+
+	c.unsubscribe = function(serviceID) {
+		c.data.action = "unsubscribe";
+		c.data.serviceID = serviceID;
+		c.server.update();
+	}
+	
+	c.doClick = function($event, outage) {
+		if (outage[0] == "detailsModal") {
+			c.detailsModal($event, outage[2], outage[3]);
+		} else if (outage[0] == "openOutage") {
+			c.openOutage($event, outage[1], outage[2], outage[3])
+		}
+	}
+	
+	c.detailsModal = function($event, $service, $name){
+		var serviceId = $service;
+		spModal.open({
+			widget: 'service_timeline_v2',
+			widgetInput: {
+				service:serviceId
+			},
+			size: 'lg',
+			title: $name,
+			buttons: []
+		})
+	}
+	
+	c.openOutage = function($event, type, $outage, $name){
+		var icon = "";
+		var text = "";
+		
+		if (type == "outage") {
+			icon = "minus";
+		  text = "danger";
+		} else if (type == "degradation") {
+			icon = "exclamation";
+			text = "warning";
+		} else if (type == "planned") {
+			icon = "info";
+			text = "primary";
+		}
+		
+		var outageId = $outage;
+		spModal.open({
+			widget: 'outage_details_v2',
+			widgetInput: {
+				outage:outageId
+			},
+			title: '<h3 style="margin-top: 10px;"><i class="fa fa-' + icon + '-circle text-' + text + '"></i> ' + $name + '</h3>',
+			buttons: []
+		})
+	}
+	
+	$scope.$on("shown.bs.modal", function(e) {
+
+	})
+	
+	$rootScope.$on("widgetRefresh", function(){
+		c.server.update();
+	});
+	
+}
+
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.title {
+  font-size: 1.5rem;
+  color: $gray-darker;
+  font-weight: 500;
+  width: 58.33333%;
+  margin: 0px;
+}
+
+.category {
+padding-top:15px;
+}
+
+.subscribed {
+  color: $text-mutted;
+  white-space: nowrap;
+}
+
+/* Status Icons */
+.fa-check-circle {
+  color: $brand-success;
+}
+
+.fa-plus-circle {
+  color: $brand-primary;
+}
+
+.fa-exclamation-circle {
+  color: $brand-danger;
+}
+
+.fa-minus-circle{
+  color: $brand-warning;
+}
+
+.fa-info-circle {
+  color: $brand-info;
+}
+
+.tb {
+  margin-top: -45px;
+  width: 100%;
+}
+
+.tb th {
+padding-bottom: 4px;
+}
+
+.outage-row {
+  text-align: center;
+	padding: 5px;
+}
+
+.fa {
+  cursor: pointer;
+font-size: 18px;
+}
+
+.date-column {
+  width: 8.3333%;
+  white-space: nowrap;
+	text-align: center;
+  font-size: 13px;
+  color: $gray-darker;
+  font-weight: 500;
+}
+
+.banner {
+  padding: 5px 0px;
+  color: white;
+  display: block;
+}
+
+.banner-success {
+	background-color: #5cb85c;
+}
+
+.label {
+  border-radius: 1em;
+  font-weight: normal;
+  font-size: 90%;
+  display: block;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>business_service_status_v2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Business Service Status v2</name>
+        <option_schema>[{"hint":"Number of Services shown (use this to optimize performance)","name":"number_of_services","section":"other","default_value":"250","label":"Number of Services","type":"integer"}]</option_schema>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+		//Subscription Update Below
+	if (typeof input != "undefined") {
+		if (input.action == "subscribe") {
+			var sub = new GlideRecord("m2m_sp_status_subscription");
+			sub.addQuery("sys_user", gs.getUserID());
+			sub.addQuery("cmdb_ci_service", input.serviceID);
+			sub.query();
+			if (!sub.next()) {
+				sub.sys_user = gs.getUserID();
+				sub.cmdb_ci_service = input.serviceID;
+				sub.insert();
+			}
+		}
+		else if (input.action == "unsubscribe") {
+			var sub2 = new GlideRecord("m2m_sp_status_subscription");
+			sub2.addQuery("sys_user", gs.getUserID());
+			sub2.addQuery("cmdb_ci_service", input.serviceID);
+			sub2.query();
+			while (sub2.next())
+				sub2.deleteRecord();
+		}	
+
+	}
+	//end subscription update
+	
+	data.monthTranslations = {
+		'Jan': gs.getMessage("Jan"),
+		'Feb': gs.getMessage("Feb"),
+		'Mar': gs.getMessage("Mar"),
+		'Apr': gs.getMessage("Apr"),
+		'May': gs.getMessage("May"),
+		'Jun': gs.getMessage("Jun"),
+		'Jul': gs.getMessage("Jul"),
+		'Aug': gs.getMessage("Aug"),
+		'Sep': gs.getMessage("Sep"),
+		'Oct': gs.getMessage("Oct"),
+		'Nov': gs.getMessage("Nov"),
+		'Dec': gs.getMessage("Dec")
+	};
+
+	data.categories = [];
+	var svs = new GlideRecord("cmdb_ci_service");
+	svs.addQuery("sys_class_name", "cmdb_ci_service");
+	svs.addQuery("operational_status", 1);
+	svs.addQuery("used_for", "Production");
+	svs.setLimit(options.number_of_services || 250);
+	svs.orderByDesc("category");
+	svs.orderBy("busines_criticality");
+	svs.orderBy("name");
+	svs.query();
+	var currentCategory = "-";
+	var catIndex = -1;
+	while (svs.next()) {
+		var cat = svs.getValue("category");
+		if (cat != currentCategory) {
+			catIndex++;
+			currentCategory = cat;
+			data.categories[catIndex] = {};
+			data.categories[catIndex].name = cat;
+			data.categories[catIndex].label = svs.getDisplayValue("category");
+			if (data.categories[catIndex].label == "")
+				data.categories[catIndex].label = gs.getMessage("Service");
+			data.categories[catIndex].services = [];
+		}
+		var svc = {};
+		svc.sys_id = svs.getUniqueValue();
+		svc.name = svs.getDisplayValue();
+		svc.safeName = GlideStringUtil.escapeHTML(svc.name);
+		svc.curOutages = getOuts(svc.sys_id); //function to get deets
+		
+		var outs = [];
+		for (var i = 0; i <= 4; i++) {
+			var out = new GlideAggregate("cmdb_ci_outage"); //counts records where...
+			out.addQuery("cmdb_ci", svs.getUniqueValue()); //the CI is the current service
+			out.addQuery("end", ">=", gs.daysAgoStart(i)).addOrCondition("end", "=", "NULL");
+			out.addQuery("begin", "<=", gs.daysAgoEnd(i));
+			out.addAggregate('COUNT', 'type');
+			out.query();
+			var svcOutageDay = {};
+			svcOutageDay.count = 0;
+
+			while (out.next()) {
+				var type = out.type;
+				var typeCount = out.getAggregate('COUNT', 'type');
+				svcOutageDay[type] = typeCount;
+				svcOutageDay.count += typeCount;
+			}
+			svcOutageDay.icon = "fa-check-circle";
+			svcOutageDay.msg = gs.getMessage("{0} - no outage", svc.safeName);
+			svcOutageDay.link = ["fine"];
+			if (svcOutageDay.count > 1) {
+				svcOutageDay.icon = "fa-plus-circle";
+				svcOutageDay.msg = gs.getMessage("{0} - multiple issues", svc.safeName);
+				svcOutageDay.link = ["detailsModal", "", svc.sys_id, svc.safeName];
+			} else if (svcOutageDay.outage > 0) {
+				svcOutageDay.icon = "fa-exclamation-circle";
+				svcOutageDay.msg = gs.getMessage("{0} - outage", svc.safeName);
+				svcOutageDay.link = ["openOutage", "outage", getSpecificOutage(svc.sys_id, i), svc.safeName];
+			} else if (svcOutageDay.degradation > 0) {
+				svcOutageDay.icon = "fa-minus-circle";
+				svcOutageDay.msg = gs.getMessage("{0} - degradation of service", svc.safeName);
+				svcOutageDay.link = ["openOutage", "degradation", getSpecificOutage(svc.sys_id, i), svc.safeName];
+			} else if (svcOutageDay.planned > 0) {
+				svcOutageDay.icon = "fa-info-circle";
+				svcOutageDay.msg = gs.getMessage("{0} - planned maintenance", svc.safeName);
+				svcOutageDay.link = ["openOutage", "planned", getSpecificOutage(svc.sys_id, i), svc.safeName];
+			}
+			outs.push(svcOutageDay);
+		}
+		svc.outages = outs;
+		data.categories[catIndex].services.push(svc);
+	}
+	data.dates = [];
+	for (var j = 5; j > 0; j--) {
+		var d = new GlideDate();
+		d.subtract(1000 * 3600 * 24 * (j - 1));
+		data.dates.push(d.getDisplayValueInternal());
+	}
+	
+	data.subs = [];
+	
+	var subsGr = new GlideRecord("m2m_sp_status_subscription");
+	subsGr.addQuery("sys_user", gs.getUserID());
+	subsGr.query();
+	while (subsGr.next()) {
+		data.subs.push(subsGr.cmdb_ci_service.toString());
+	}
+
+	function getOuts(serviceID) {
+		var rtn = [];
+		var num = 0;
+		var type = "";
+		var outageId = ""
+		var gr = new GlideRecord("cmdb_ci_outage");
+		gr.addQuery("cmdb_ci",serviceID);
+		gr.addQuery("end", "NULL");
+		gr.query();
+		while (gr.next()) {
+			num++;
+			if (num > 1) {
+				type = "Multiple";
+			} else {
+				type = gr.getDisplayValue("type");
+				outageId = gr.getUniqueValue();
+			}
+		}
+		rtn.push(num);
+		rtn.push(type);
+		rtn.push(outageId);
+		return rtn;
+	}
+	
+	function getSpecificOutage(sysid, day) {
+		var gr = new GlideRecord("cmdb_ci_outage"); //counts records where...
+		gr.addQuery("cmdb_ci", sysid); //the CI is the current service
+		gr.addQuery("end", ">=", gs.daysAgoStart(day)).addOrCondition("end", "=", "NULL");
+		gr.addQuery("begin", "<=", gs.daysAgoEnd(day));
+		gr.query();
+		
+		if(gr.next()) {
+			return gr.getUniqueValue();
+		} else {
+			return "No Results";
+		}
+	}
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-07-14 23:52:38</sys_created_on>
+        <sys_id>bad148d7db623300b0b0a0f2ca961988</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>Business Service Status v2</sys_name>
+        <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+        <sys_update_name>sp_widget_bad148d7db623300b0b0a0f2ca961988</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-07-19 01:23:17</sys_updated_on>
+        <template><![CDATA[<div class="panel panel-default">
+  <div class="panel-heading">&nbsp;</div>
+  <div class="panel-body">
+    <table class="tb">
+      <thead>
+        <th scope="col">
+          <h2 class="panel-title title">
+            ${Status History}
+          </h2>
+        </th>
+        <th scope="col" class="date-column">${Subscribe}</th>
+        <th scope="col" ng-repeat="date in ::data.dates" class="date-column">{{::date.month}} {{::date.day}}</th>
+        <th scope="col" class="date-column">${Now}</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat-start="category in ::c.data.categories" aria-hidden="true">
+          <th scope="col" colspan="4" title="{{::category.label}}"><h3 class="title category" ng-bind-html="::category.label"></h3></th>
+        </tr>
+        <tr ng-repeat-end ng-repeat="service in ::category.services">
+          <td scope="row">
+            <a href="javascript:void(0)" data-service="{{service.sys_id}}" ng-click="c.detailsModal($event, service.sys_id, service.name)" ng-bind-html="::service.name" title="Click for more info"></a>
+
+          </td>
+          <td class="outage-row">
+            <i ng-if="data.subs.indexOf(service.sys_id) !== -1" title="${Click to unsubscribe to updates}" ng-click="c.unsubscribe(service.sys_id)" class="fa fa-envelope"></i>
+            <i ng-if="data.subs.indexOf(service.sys_id) == -1" title="${Click to subscribe to updates}" ng-click="c.subscribe(service.sys_id)" class="fa fa-envelope-o"></i>
+          </td>
+          <td ng-repeat="n in [0,1,2,3,4] track by $index" class="outage-row">
+            <span 
+                  class="fa" 
+                  href="javascript:void(0)" 
+                  data-outage="{{outage.sys_id}}" 
+                  ng-click="c.doClick($event, service.outages[4-$index].link)"
+                  ng-class="::service.outages[4-$index].icon" 
+                  sp-tooltip
+                  aria-label="{{::data.dates[$index].month + ' ' + data.dates[$index].day + ' - ' + service.outages[4-$index].msg}}"
+                  role="application" 
+                  tooltip-smart="true"
+                  tooltip-template="{{::service.outages[4-$index].msg + ' - ' + data.dates[$index].month + ' ' + data.dates[$index].day}}">
+            </span>
+          </td>
+          <td class="outage-row">
+            <span ng-if="service.curOutages[0] == 0" 
+                  class="label label-success">${Operational}
+            </span>
+            <span ng-if="service.curOutages[0] == 1 && service.curOutages[1] == 'Outage'" 
+                  href="javascript:void(0)" 
+                  ng-click="c.openOutage($event, 'outage', service.curOutages[2], service.name)" 
+                  class="label label-danger">{{service.curOutages[1]}}
+            </span>
+            <span ng-if="service.curOutages[0] == 1 && service.curOutages[1] == 'Planned Outage'"
+                  href="javascript:void(0)" 
+                  ng-click="c.openOutage($event, 'planned', service.curOutages[2], service.name)" 
+                  class="label label-info">{{service.curOutages[1]}}
+            </span>
+            <span ng-if="service.curOutages[0] == 1 && service.curOutages[1] == 'Degradation'"
+                  href="javascript:void(0)" 
+                  ng-click="c.openOutage($event, 'degredation', service.curOutages[2], service.name)" 
+                  class="label label-warning">{{service.curOutages[1]}}
+            </span>
+            <span ng-if="service.curOutages[0] > 1" 
+                  href="javascript:void(0)" 
+                  ng-click="c.detailsModal($event, service.sys_id, service.name)"
+                  class="label label-primary">${Multiple Issues}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

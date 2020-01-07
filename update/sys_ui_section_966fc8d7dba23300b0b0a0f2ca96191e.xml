@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="Outage Details" section_id="966fc8d7dba23300b0b0a0f2ca96191e" sys_domain="global" table="cmdb_ci_outage" version="3" view="">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>details</element>
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2019-07-15 00:52:49</sys_created_on>
+            <sys_id>5caf881bdba23300b0b0a0f2ca9619ff</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Outage Details" display_value="Outage Details" name="cmdb_ci_outage" sys_domain="global" view="Default view">966fc8d7dba23300b0b0a0f2ca96191e</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2019-07-15 00:52:49</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_44522_sysstatsv2_u_resolution_notes</element>
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2019-07-15 00:52:49</sys_created_on>
+            <sys_id>d0afc81bdba23300b0b0a0f2ca961900</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Outage Details" display_value="Outage Details" name="cmdb_ci_outage" sys_domain="global" view="Default view">966fc8d7dba23300b0b0a0f2ca96191e</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2019-07-15 00:52:49</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>Outage Details</caption>
+            <header>false</header>
+            <name>cmdb_ci_outage</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2019-07-15 00:51:51</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>966fc8d7dba23300b0b0a0f2ca96191e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Outage Details</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="System Status v2" source="x_44522_sysstatsv2">c9810417db223300b0b0a0f2ca96191a</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="System Status v2">c9810417db223300b0b0a0f2ca96191a</sys_scope>
+            <sys_update_name>sys_ui_section_966fc8d7dba23300b0b0a0f2ca96191e</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2019-07-15 00:51:51</sys_updated_on>
+            <sys_user/>
+            <title>false</title>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>
